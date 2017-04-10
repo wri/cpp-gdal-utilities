@@ -57,6 +57,7 @@ double adfGeoTransform[6] = { ulx, pixelsize, 0, uly, 0, -1*pixelsize };
 OUTGDAL = OUTDRIVER->Create( out_name.c_str(), xsize, ysize, 1, GDT_Byte, papszOptions );
 OUTGDAL->SetGeoTransform(adfGeoTransform); OUTGDAL->SetProjection(OUTPRJ); 
 OUTBAND1 = OUTGDAL->GetRasterBand(1);
+OUTGDAL.SetNoDataValue(255);
 
 //read/write data
 uint16_t in1_data[xsize];
