@@ -26,7 +26,6 @@ string out_name=argv[3];
 //setting variables
 int x, y;
 int xsize, ysize;
-int total_days;
 double GeoTransform[6]; double ulx, uly; double pixelsize;
 
 //initialize GDAL for reading
@@ -57,18 +56,17 @@ double adfGeoTransform[6] = { ulx, pixelsize, 0, uly, 0, -1*pixelsize };
 OUTGDAL = OUTDRIVER->Create( out_name.c_str(), xsize, ysize, 1, GDT_Byte, papszOptions );
 OUTGDAL->SetGeoTransform(adfGeoTransform); OUTGDAL->SetProjection(OUTPRJ); 
 OUTBAND1 = OUTGDAL->GetRasterBand(1);
-OUTGDAL.SetNoDataValue(255);
+OUTBAND1->SetNoDataValue(255);
 
 //read/write data
-uint16_t in1_data[xsize];
-uint16_t in2_data[xsize];
+uint8_t in1_data[xsize];
+uint8_t in2_data[xsize];
 uint8_t out_data1[xsize];
 
 for(y=0; y<ysize; y++) {
-INBAND->RasterIO(GF_Read, 0, y, xsize, 1, in1_data, xsize, 1, GDT_UInt16, 0, 0); 
-INBAND2->RasterIO(GF_Read, 0, y, xsize, 1, in2_data, xsize, 1, GDT_UInt16, 0, 0); 
+INBAND->RasterIO(GF_Read, 0, y, xsize, 1, in1_data, xsize, 1, GDT_Byte, 0, 0); 
+INBAND2->RasterIO(GF_Read, 0, y, xsize, 1, in2_data, xsize, 1, GDT_Byte, 0, 0); 
 for(x=0; x<xsize; x++) {
-
   if (in1_data[x] > 1 && in1_data[x] < 11) {
     out_data1[x] = 20 + in2_data[x];}
   else if (in1_data[x] > 10 && in1_data[x] < 16) {
@@ -87,9 +85,11 @@ for(x=0; x<xsize; x++) {
     out_data1[x] = 160 + in2_data[x];}
   else {
     out_data1[x] = 255;}
+  //cout << in1_data[x] << "," << in2_data[x] << "," << out_data1[x] << "\n";
+
 //closes for x loop
 }
-OUTBAND1->RasterIO( GF_Write, 0, y, xsize, 1, out_data1, xsize, 1, GDT_UInt16, 0, 0 ); 
+OUTBAND1->RasterIO( GF_Write, 0, y, xsize, 1, out_data1, xsize, 1, GDT_Byte, 0, 0 ); 
 //closes for y loop
 }
 
